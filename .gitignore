@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+.venv/
+.ipynb_checkpoints/
+
+# Never commit MSK-CHORD data or derived tables (CC BY-NC-ND 4.0)
+MSK_CHORD*/
+Derived/
+*.pkl
+*.pickle
+*.parquet
+*.feather
+data_*.txt
+data_*.seg
+*.tsv
+*.csv
+*.ipynb

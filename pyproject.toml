@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chordutils"
+version = "0.1.0"
+description = "Entity-agnostic cohort building, treatment lines and real-world endpoints for the MSK-CHORD database"
+authors = [{ name = "H. Carlo Maurer", email = "h.carlo.maurer@gmail.com" }]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["msk-chord", "cbioportal", "real-world-data", "oncology", "lines-of-therapy", "survival"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+dependencies = [
+    "numpy>=1.22",
+    "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+survival = ["lifelines>=0.27"]   # survival.association_screen (Cox models)
+test = ["pytest>=7", "lifelines>=0.27"]
+
+[project.urls]
+Repository = "https://github.com/fossbert/chordutils"
+Issues = "https://github.com/fossbert/chordutils/issues"
+
+[tool.setuptools.packages.find]
+include = ["chordutils*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
