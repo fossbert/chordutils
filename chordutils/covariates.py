@@ -125,10 +125,12 @@ def genomic_features(study, sample_ids: Sequence[str], genes: Sequence[str] = ()
     GENE_PANEL / data_gene_panel_matrix.txt). The MSK-CHORD download does not contain the gene
     lists of the panels, and data_cna.txt reports 0 (not missing) for genes that were not on a
     sample's panel. Without ``panel_genes`` a gene that was not sequenced therefore appears as
-    NOT altered. Pass ``panel_genes`` (e.g. from the cBioPortal gene panel files) to set
-    all calls of genes outside a sample's panel to missing; otherwise consider GENE_PANEL in
-    the analysis (e.g. a sensitivity analysis without IMPACT341 samples) for genes that were
-    added in later panel versions.
+    NOT altered. Pass ``panel_genes`` (from the cBioPortal gene panel files, or derived from an
+    alteration export with ``cbioportal.panel_genes_from_export``) to set all calls of genes
+    outside a sample's panel to missing; otherwise consider GENE_PANEL in the analysis (e.g. a
+    sensitivity analysis without IMPACT341 samples) for genes that were added in later panel
+    versions. Genes that appear in none of the ``panel_genes`` lists are left unmasked (their
+    panel coverage is unknown, e.g. genes outside the query of an export).
 
     Parameters
     ----------
@@ -140,7 +142,8 @@ def genomic_features(study, sample_ids: Sequence[str], genes: Sequence[str] = ()
         Genes for which the protein changes (HGVSp_Short, e.g. 'p.G12D') are listed as
         <GENE>_PROTEIN (joined by ','), e.g. to classify KRAS alleles.
     panel_genes : dict of {panel: genes}, optional
-        Genes on each panel (keys as in data_gene_panel_matrix.txt, column 'mutations').
+        Genes on each panel (keys as in data_gene_panel_matrix.txt, column 'mutations'). Only
+        genes listed for at least one panel are masked.
     panel_sizes_mb : dict of {panel: Mb}, optional
         Coding size per panel; if given, TMB = N_NONSYN / size is added. No defaults are
         provided on purpose: use the sizes of the panel version you cite.
@@ -166,6 +169,7 @@ def genomic_features(study, sample_ids: Sequence[str], genes: Sequence[str] = ()
     mutated = set(zip(mut["Tumor_Sample_Barcode"], mut["Hugo_Symbol"]))
     fused = set(zip(sv["Sample_Id"], sv["Site1_Hugo_Symbol"])) | set(zip(sv["Sample_Id"], sv["Site2_Hugo_Symbol"]))
 
+    known_panel_genes = {g for gl in (panel_genes or {}).values() for g in gl}
     cols = {}
     for g in all_genes:
         cn = cna.loc[g] if g in cna.index else pd.Series(np.nan, index=sids)
@@ -173,7 +177,7 @@ def genomic_features(study, sample_ids: Sequence[str], genes: Sequence[str] = ()
                  "HOMDEL": (cn == -2).astype(float).where(cn.notna()),
                  "AMP": (cn == 2).astype(float).where(cn.notna()),
                  "FUSION": pd.Series([float((s, g) in fused) for s in sids], index=sids)}
-        if panel_genes is not None:
+        if panel_genes is not None and g in known_panel_genes:
             on_panel = panel.map(lambda p, g=g: g in panel_genes.get(p, ())).astype(bool)
             calls = {k: v.where(on_panel) for k, v in calls.items()}
         for kind, call in calls.items():

@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.0 (2026-09-30)
+
+### Added
+- `cbioportal`: driver (OncoKB) annotations from cBioPortal "alterations across samples"
+  exports. `read_alteration_export` (one row per event with gene, type MUT/AMP/HOMDEL/FUSION
+  and driver flag, plus profiling per gene and type), `driver_event_matrix` (samples x
+  'GENE:EVENT'), `driver_gene_matrix` (`<GENE>_DRIVER`, `<GROUP>_DRIVER`/`_N_DRIVER`,
+  `<GENE>_SV`), `panel_genes_from_export` (panel gene content for `genomic_features`).
+  Developed from an earlier notebook routine (TCGA CRC); on that export the driver values are
+  identical wherever the gene was profiled. Differences by design: "not profiled" is missing
+  instead of 0 (the old routine counted 62 TCGA samples without mutation data as wild type),
+  samples instead of patients as index, profiling per alteration type, structural variants
+  (never labelled as drivers) in their own column `<GENE>_SV`. Checked on twelve exports (MSK-CHORD,
+  MSK-MET, GENIE BPC CRC, TCGA, CPTAC).
+
+### Changed
+- `covariates.genomic_features`: `panel_genes` masks only genes listed for at least one panel;
+  genes of unknown coverage (e.g. outside an export's gene query) stay unmasked.
+
 ## 0.1.0 (2026-09-29)
 
 First release as a package, developed from the single module `chordutils.py` of the

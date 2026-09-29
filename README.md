@@ -56,6 +56,7 @@ T = cu.covariates.build_line_table(E, cohort, db, study)   # one analysis row pe
 | `endpoints` | `patient_followup`, `collapse_assessments`, `line_endpoints` (TTD, TTNT, rwPFS, OS), `os_base` |
 | `survival` | `km_estimate`/`km_median` (delayed entry), `summarize_endpoint`, `exposure_days`, `to_counting_process`, `landmark`, `association_screen`, `benjamini_hochberg` |
 | `covariates` | `patient_covariates`, `genomic_features`, `baseline_values`, `line_history`, `line_baselines`, `marker_kinetics`, `build_line_table` |
+| `cbioportal` | `read_alteration_export`, `driver_event_matrix`, `driver_gene_matrix`, `panel_genes_from_export` (OncoKB driver annotations from cBioPortal exports) |
 | `windows` | legacy look-ups around an event: `find_stagings`, `find_ps`, `find_markers` |
 
 ## Conventions and caveats
@@ -72,6 +73,32 @@ T = cu.covariates.build_line_table(E, cohort, db, study)   # one analysis row pe
   `genomic_features` to mask off-panel genes, or account for `GENE_PANEL`.
 - **Sample timing.** `SEQ_DATE` is the day of sequencing; the day the tissue was obtained is
   `SAMPLE_ACQ_DAY` (specimen-surgery timeline).
+
+## Driver annotation (OncoKB) from cBioPortal
+
+The raw genomic files carry no functional annotation. For a gene query on cBioPortal,
+*Download -> Alterations across samples* gives a table in which alterations are labelled
+"(driver)" (OncoKB and hotspots by default) and genes not covered by a sample's panel are
+"not profiled":
+
+```python
+cfg = cohort.config
+ex = cu.cbioportal.read_alteration_export("alterations_across_samples.tsv")
+events = cu.cbioportal.driver_event_matrix(ex)     # samples x 'KRAS:G12D', 'ERBB2:AMP', ...
+drivers = cu.cbioportal.driver_gene_matrix(ex, gene_groups=cfg.gene_groups)  # <GENE>_DRIVER, <GENE>_SV
+
+# raw calls with panel coverage derived from the export, then both onto the line table
+panel = study.read("data_gene_panel_matrix.txt").set_index("SAMPLE_ID")["mutations"]
+G = cu.covariates.genomic_features(study, cohort.samples.SAMPLE_ID, cfg.genes, cfg.gene_groups,
+                                   panel_genes=cu.cbioportal.panel_genes_from_export(ex, panel))
+T = cu.covariates.build_line_table(E, cohort, db, study, genomics=G.merge(drivers, on="SAMPLE_ID", how="left"))
+```
+
+`driver_gene_matrix` raises an error if a gene of `gene_groups` is not part of the export's
+gene query; include all group genes when downloading.
+
+"Not profiled" is kept as missing (per gene and alteration type). Structural variants are
+never labelled as drivers in the exports and are reported separately as `<GENE>_SV`.
 
 ## Adding an entity
 

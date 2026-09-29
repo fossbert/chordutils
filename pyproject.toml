@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chordutils"
-version = "0.1.0"
+version = "0.2.0"
 description = "Entity-agnostic cohort building, treatment lines and real-world endpoints for the MSK-CHORD database"
 authors = [{ name = "H. Carlo Maurer", email = "h.carlo.maurer@gmail.com" }]
 readme = "README.md"

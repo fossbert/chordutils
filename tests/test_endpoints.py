@@ -221,5 +221,7 @@ def test_genomic_features_panel_mask(tmp_path):
     assert g["HR_ALT"].tolist() == [1, 1] and g["KRAS_PROTEIN"].tolist()[0] == "p.G12D"
     assert g["N_NONSYN"].tolist() == [2, 0]
 
-    masked = genomic_features(study, ["S1", "S2"], ["BRCA2"], panel_genes={"NEW": ["BRCA2"], "OLD": []}).set_index("SAMPLE_ID")
+    masked = genomic_features(study, ["S1", "S2"], ["BRCA2", "KRAS"],
+                              panel_genes={"NEW": ["BRCA2"], "OLD": []}).set_index("SAMPLE_ID")
     assert masked["BRCA2_ALT"].iloc[0] == 1 and np.isnan(masked["BRCA2_ALT"].iloc[1])
+    assert masked["KRAS_ALT"].tolist() == [1, 1]       # KRAS in no panel list -> coverage unknown, unmasked
