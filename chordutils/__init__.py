@@ -13,6 +13,7 @@ lines       ``build_lines_of_therapy``, ``classify_regimen``
 endpoints   follow-up, per-day imaging assessments, TTD/TTNT/rwPFS per line, OS from any origin
 survival    Kaplan-Meier with delayed entry, time-varying exposures, landmark, Cox screen
 covariates  patient/tumour, genomic (panel-aware), treatment history, baselines, marker kinetics
+markers     values within lines of therapy (``marker_course``) and tumgr input (``to_tumgr``)
 cbioportal  driver (OncoKB) matrices from cBioPortal 'alterations across samples' exports
 therapy     ``pivot_therapies``: one row per agent -> non-overlapping regimen episodes
 windows     legacy look-ups around an event (``find_stagings``, ``find_ps``, ``find_markers``)
@@ -33,10 +34,10 @@ The functions of the former single-file module remain available as ``chordutils.
 
 from . import entities
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 from .attrition import AttritionLog
 from .cohort import Cohort, select_cohort
-from . import cbioportal, covariates, endpoints, lines, survival
+from . import cbioportal, covariates, endpoints, lines, markers, survival
 from .config import EntityConfig, LineRules, TreatmentRules, icdo_topography_pattern
 from .io import ChordStudy, pickle_transfer, read_cbio_table, read_clinical_dictionary
 from .tables import (build_database, imaging_assessments, performance_status, radiation, surgeries,

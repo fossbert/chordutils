@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 (2026-09-30)
+
+### Added
+- `markers.marker_course`: values of a tumour marker (or any longitudinal variable, e.g. ECOG)
+  within each line of therapy, one row per value and line. Window from `pre_days` before the
+  line start to `post_days` after its end (default 21/21), cut at the start of the next line;
+  baseline = last value up to the line start (`baseline='all'` keeps all pre-treatment
+  values); optional baseline threshold (`baseline_above`, e.g. the ULN); same-day values
+  combined by mean, median or first; minimum number of values; every exclusion logged.
+- `markers.to_tumgr`: input for `tumgr::gdrate` (name/date/size). tumgr requires numeric
+  identifiers, so lines get running numbers; the mapping is returned.
+  Checked with tumgr 0.0.4: zeros during follow-up and courses with two values are accepted.
+
 ## 0.2.0 (2026-09-30)
 
 ### Added

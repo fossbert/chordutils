@@ -56,6 +56,7 @@ T = cu.covariates.build_line_table(E, cohort, db, study)   # one analysis row pe
 | `endpoints` | `patient_followup`, `collapse_assessments`, `line_endpoints` (TTD, TTNT, rwPFS, OS), `os_base` |
 | `survival` | `km_estimate`/`km_median` (delayed entry), `summarize_endpoint`, `exposure_days`, `to_counting_process`, `landmark`, `association_screen`, `benjamini_hochberg` |
 | `covariates` | `patient_covariates`, `genomic_features`, `baseline_values`, `line_history`, `line_baselines`, `marker_kinetics`, `build_line_table` |
+| `markers` | `marker_course` (values of a marker or other longitudinal variable within each line of therapy), `to_tumgr` (input for tumour growth/decay models) |
 | `cbioportal` | `read_alteration_export`, `driver_event_matrix`, `driver_gene_matrix`, `panel_genes_from_export` (OncoKB driver annotations from cBioPortal exports) |
 | `windows` | legacy look-ups around an event: `find_stagings`, `find_ps`, `find_markers` |
 
@@ -99,6 +100,22 @@ gene query; include all group genes when downloading.
 
 "Not profiled" is kept as missing (per gene and alteration type). Structural variants are
 never labelled as drivers in the exports and are reported separately as `<GENE>_SV`.
+
+## Tumour marker courses within lines (tumgr)
+
+```python
+sel = E.query("REGIMEN == 'FOLFIRINOX' and LINE == 1")     # E from endpoints.line_endpoints
+course = cu.markers.marker_course(sel, db["TUMORMARKER"], "CA19-9 (U/mL)",
+                                  baseline_above=37, same_day="mean", log=cohort.log)
+tumgr_input, names = cu.markers.to_tumgr(course)           # name/date/size, all numeric
+# e.g. cbrrwd.rbackend.tumor_growth.gdrate(tumgr_input, 0.05); map results back with `names`
+```
+
+Defaults: window from 21 days before the line start to 21 days after its end, cut at the start
+of the next line; only the last value up to the line start is kept as baseline (time 0);
+several values per day are averaged (`same_day='median'` or `'first'` possible). Pass the
+output of `line_endpoints` (or add `NEXT_LINE_START`) so that the next line is known even for a
+selection of lines.
 
 ## Adding an entity
 
