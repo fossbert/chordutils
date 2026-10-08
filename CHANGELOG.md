@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- `cbioportal` moved to the new package `cbiokit` (`cbiokit.alterations`); `chordutils.cbioportal` is
+  now a thin alias, so existing code keeps working. `cbiokit` is a new dependency; its tests replace
+  `tests/test_cbioportal.py`.
+
 ## 0.3.0 (2026-09-30)
 
 ### Added

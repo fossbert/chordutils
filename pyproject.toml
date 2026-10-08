@@ -23,6 +23,7 @@ classifiers = [
 dependencies = [
     "numpy>=1.22",
     "pandas>=2.0",
+    "cbiokit>=0.1",   # cbioportal alias; pip install -e ../cbiokit until published
 ]
 
 [project.optional-dependencies]

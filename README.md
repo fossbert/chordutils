@@ -57,7 +57,7 @@ T = cu.covariates.build_line_table(E, cohort, db, study)   # one analysis row pe
 | `survival` | `km_estimate`/`km_median` (delayed entry), `summarize_endpoint`, `exposure_days`, `to_counting_process`, `landmark`, `association_screen`, `benjamini_hochberg` |
 | `covariates` | `patient_covariates`, `genomic_features`, `baseline_values`, `line_history`, `line_baselines`, `marker_kinetics`, `build_line_table` |
 | `markers` | `marker_course` (values of a marker or other longitudinal variable within each line of therapy), `to_tumgr` (input for tumour growth/decay models) |
-| `cbioportal` | `read_alteration_export`, `driver_event_matrix`, `driver_gene_matrix`, `panel_genes_from_export` (OncoKB driver annotations from cBioPortal exports) |
+| `cbioportal` | `read_alteration_export`, `driver_event_matrix`, `driver_gene_matrix`, `panel_genes_from_export` (alias of `cbiokit.alterations`, where the code now lives) |
 | `windows` | legacy look-ups around an event: `find_stagings`, `find_ps`, `find_markers` |
 
 ## Conventions and caveats
